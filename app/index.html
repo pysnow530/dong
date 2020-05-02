@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <title>Dong - Keep your secret from anybody</title>
+  </head>
+  <body>
+
+    <div id="app" class="container" style="padding-top: 30px">
+
+      <div class="row">
+        <div class="col-md-12">
+
+          <form id="abracadabra-form">
+            <div class="form-group">
+              <label for="abracadabra">Your abracadabra</label>
+              <input v-model="abracadabra" type="password" class="form-control" id="abracadabra" name="abracadabra" aria-describedby="abracadabraHelp">
+              <small id="abracadabraHelp" class="form-text text-muted">Say out your abracadabra, there is no eavesdropper between you and yourself.</small>
+            </div>
+            <button type="button" class="btn btn-primary" @click="handleGetPapers()">SING</button>
+            <button type="button" class="btn btn-primary float-right" @click="handleCreatePaper()">CREATE</button>
+          </form>
+
+          <div v-for="paper in papers" class="paper card">
+            <div class="card-body">
+
+              <h5 class="card-title">
+                <input v-if="paper.editing" type="text" name="title" v-model="paper.data.title">
+                <span v-else>
+                  {{ paper.data.title }}
+                </span>
+              </h5>
+
+              <!-- <h6 class="card&#45;subtitle mb&#45;2 text&#45;muted">2020&#45;05&#45;01 Fri</h6> -->
+
+              <textarea v-if="paper.editing" name="data" v-model="paper.data.data" style="width: 100%" rows="10"></textarea>
+              <p v-else class="card-text">{{ paper.data.data }}</p>
+
+              <a @click="handleDeletePaper(paper)" href="javascript:void(0)" class="card-link">Throw away</a>
+
+              <a v-if="!paper.editing" @click="paper.editing = true" href="javascript:void(0)" class="card-link">Edit</a>
+              <a v-else @click="handleUpdatePaper(paper)" href="javascript:void(0)" class="card-link">Save</a>
+
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <!-- <script src="https://code.jquery.com/jquery&#38;#453.4.1.slim.min.js" integrity="sha384&#38;#45J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384&#45;Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script> -->
+    <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384&#45;wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script> -->
+
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
+    <script src="/app/node_modules/vue/dist/vue.js"></script>
+    <script src="/app/node_modules/vue-resource/dist/vue-resource.js"></script>
+    <script src="/app/node_modules/moment/moment.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/app/lib/crypto-js/rollups/aes.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/app/lib/crypto-js/rollups/sha256.js"></script>
+
+    <script>
+      var app = new Vue({
+        el: '#app',
+        data: {
+          abracadabra: '',
+          papers: [],
+        },
+        methods: {
+          handleGetPapers() {
+            this.$http.get('/api/v1/papers', {headers: {'ABRACADABRA-TOKEN': this.abracadabraToken}}).then(response => {
+              this.papers = (response.body.data || []).map((paper) => {
+                paper.data = this.decryptAndDecode(paper.data, this.aesKey)
+                paper.editing = false
+                return paper
+              })
+            })
+          },
+          handleCreatePaper() {
+            const paperData = {title: 'Untitled', content_type: 'text/markdown', data: 'anything here'}
+            const paperDataCrypted = this.encryptAndEncode(paperData)
+            this.$http.post('/api/v1/papers', {data: paperDataCrypted}, {headers: {'ABRACADABRA-TOKEN': this.abracadabraToken}}).then(response => {
+              var paper = response.body
+              paper.data = this.decryptAndDecode(paper.data, this.aesKey)
+              paper.editing = false
+              this.papers.unshift(paper)
+            })
+          },
+          handleDeletePaper(paper) {
+            if (!confirm('You will lost this paper, confirm?')) {
+              return
+            }
+
+            this.$http.delete(`/api/v1/papers/${paper.id}`, {headers: {'ABRACADABRA-TOKEN': this.abracadabraToken}}).then(response => {
+              this.papers = this.papers.filter((i) => i.id != paper.id)
+            })
+          },
+          handleUpdatePaper(paper) {
+            this.$http.put(`/api/v1/papers/${paper.id}`, {data: this.encryptAndEncode(paper.data)}, {headers: {'ABRACADABRA-TOKEN': this.abracadabraToken}}).then(response => {
+              paper.editing = false;
+            })
+          },
+          encryptAndEncode(data) {
+            r = CryptoJS.AES.encrypt(JSON.stringify(data), this.aesKey).toString()
+            return r
+          },
+          decryptAndDecode(data) {
+            r = JSON.parse(CryptoJS.AES.decrypt(data, this.aesKey).toString(CryptoJS.enc.Utf8))
+            return r
+          }
+        },
+        computed: {
+          aesKey() {
+            return CryptoJS.SHA256(this.abracadabra).toString().substr(0, 32)
+          },
+          abracadabraToken() {
+            return CryptoJS.SHA256(this.abracadabra).toString().substr(32, 32)
+          }
+        },
+        mounted() {
+          this.handleGetPapers()
+        }
+      })
+    </script>
+
+    <style type="text/css" media="screen">
+      .paper.card {
+        margin: 20px 0;
+      }
+    </style>
+  </body>
+</html>
