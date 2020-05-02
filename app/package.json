@@ -4,7 +4,9 @@
   "description": "keep your secret",
   "main": "index.js",
   "dependencies": {
+    "bootstrap": "^4.4.1",
     "crypto-js": "^4.0.0",
+    "marked": "^1.0.0",
     "moment": "^2.25.0",
     "vue": "^2.6.11",
     "vue-resource": "^1.5.1"
