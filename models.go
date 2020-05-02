@@ -44,7 +44,7 @@ func (paper *Paper) Decrypt(key []byte) error {
 }
 
 func ConnectDB(dsn string) (*gorm.DB, error) {
-	DB, err := gorm.Open("sqlite", dsn)
+	DB, err := gorm.Open("sqlite3", dsn)
 	if err != nil {
 		return nil, err
 	}
