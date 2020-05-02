@@ -1,0 +1,30 @@
+{
+  "name": "dong",
+  "version": "1.0.0",
+  "description": "keep your secret",
+  "main": "index.js",
+  "dependencies": {
+    "moment": "^2.25.0",
+    "vue-resource": "^1.5.1",
+    "vue": "^2.6.11"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo wip"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pysnow530/dong.git"
+  },
+  "keywords": [
+    "secret",
+    "aes",
+    "sha256"
+  ],
+  "author": "pysnow530@163.com",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/pysnow530/dong/issues"
+  },
+  "homepage": "https://github.com/pysnow530/dong#readme"
+}
