@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/base64"
 	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"time"
 )
 
@@ -44,7 +44,7 @@ func (paper *Paper) Decrypt(key []byte) error {
 }
 
 func ConnectDB(dsn string) (*gorm.DB, error) {
-	DB, err := gorm.Open("mysql", dsn)
+	DB, err := gorm.Open("sqlite", dsn)
 	if err != nil {
 		return nil, err
 	}

@@ -12,7 +12,7 @@ var DB *gorm.DB
 
 var flagAddr = flag.String("addr", "127.0.0.1:5300", "serving address")
 var FlagSalt = flag.String("salt", "saltish", "salt for encrypt")
-var flagDsn = flag.String("dsn", "root:hello@(localhost)/dong?charset=utf8&parseTime=True", "mysql dsn")
+var flagDsn = flag.String("dsn", "data/papers.db", "database dsn")
 
 func main() {
 	flag.Parse()
@@ -22,7 +22,12 @@ func main() {
 		log.Fatalf("Connect to db failed: %s\n", err.Error())
 	}
 	DB = db
-	defer DB.Close()
+	defer func() {
+		err := DB.Close()
+		if err != nil {
+			log.Fatalf("Close db connection failed: %s\n", err.Error())
+		}
+	}()
 
 	srv := &http.Server{
 		Handler:      GetGlobalHandler(),
