@@ -46,3 +46,17 @@ r128 --------------------> aesKey
                 aes (aesKey)
 encryptedData ----------------> encryptedEncryptedData
 ```
+
+### install
+
+Install dong is simple, clone this repo and run the following command:
+
+```shell script
+# build from source
+go build
+
+# start server
+./dong -addr :5300
+
+# then open http://localhost:5300/app/ from your browser
+```
