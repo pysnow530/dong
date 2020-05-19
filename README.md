@@ -52,6 +52,9 @@ encryptedData ----------------> encryptedEncryptedData
 Install dong is simple, clone this repo and run the following command:
 
 ```shell script
+# install npm modules
+(cd app && npm install)
+
 # build from source
 go build
 
