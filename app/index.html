@@ -29,7 +29,7 @@
                 <button type="button" class="btn btn-primary float-right" @click="handleCreatePaper()">CREATE</button>
             </form>
 
-            <div v-for="paper in papers" class="paper card">
+            <div v-for="paper in papers" class="paper card markdown">
                 <div class="card-body">
 
                     <h6 class="card-subtitle mb-2 text-muted">{{ paper.created_at | dateformat("YYYY-MM-DD dddd") }}</h6>
@@ -141,6 +141,10 @@
 <style type="text/css" media="screen">
     .paper.card {
         margin: 20px 0;
+    }
+
+    .paper.card.markdown img {
+        width: 100%;
     }
 </style>
 
