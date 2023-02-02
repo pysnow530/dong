@@ -9,7 +9,7 @@
     "marked": "^1.0.0",
     "moment": "^2.25.0",
     "vue": "^2.6.11",
-    "vue-resource": "^1.5.1"
+    "vue-resource": "^1.5.3"
   },
   "devDependencies": {},
   "scripts": {
